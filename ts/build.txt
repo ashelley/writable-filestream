@@ -1,0 +1,3 @@
+FileStream.ts
+
+--out ../index.js
