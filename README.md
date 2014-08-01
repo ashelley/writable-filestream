@@ -2,6 +2,7 @@ A simple replacement for fs.createWriteStream that uses [stream buffers](https:/
 
 Why? 
 - fs.createWriteStream as of Node 10.30 seems to have problems if you write to it alot. See https://github.com/joyent/node/issues/8048
+- i couldn't immediately find an alternative to fs.createWriteStream in the npm database or on github.  Please let me know if you know of one!
 
 Installation
 
