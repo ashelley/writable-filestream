@@ -4,6 +4,7 @@ var stream = require('stream');
 var util = require('util');
 var Writable = stream.Writable;
 var fs = require('fs');
+var streamBuffers = require('stream-buffers');
 
 class BaseStream {
 
@@ -15,11 +16,14 @@ class FileStream extends BaseStream {
   private buffer;
   private filePath;
   constructor(filePath, options) {    
+    var bufferOptions
+    if(options) {
+      bufferOptions = options.bufferOptions;
+    }
     super();
     Writable.call(this, options);    
     this.filePath = filePath;
-    this.buffer = new Buffer('');
-    var self = this;
+    this.buffer = new streamBuffers.WritableStreamBuffer(bufferOptions);
   }
 
   flushToDisk(done:Function) {
@@ -28,7 +32,9 @@ class FileStream extends BaseStream {
       if(err) {
         done(err);
       } else {
-        fs.write(fd, self.buffer, 0, self.buffer.length, null, function(err) {
+        var length = self.buffer.size();
+        var buffer = self.buffer.getContents();
+        fs.write(fd, buffer, 0, length, null, function(err) {
           if(err) {
             done(err);
           } else {
@@ -53,9 +59,8 @@ class FileStream extends BaseStream {
     });
   }  
 
-  _write(chunk, encoding, callback) {
-    var buffer = (Buffer.isBuffer(chunk)) ? chunk : new Buffer(chunk, encoding);
-    this.buffer = Buffer.concat([this.buffer, buffer]);
+  _write(chunk, encoding, callback) {    
+    this.buffer.write(chunk, encoding);
     callback();
   }
 }
